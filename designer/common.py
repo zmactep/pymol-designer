@@ -1,7 +1,8 @@
 """Common functions and classes"""
 
 import asyncio
-from PyQt5.QtCore import QWidget, QObject, QThread, pyqtSignal
+from PyQt5.QtWidgets import QWidget
+from PyQt5.QtCore import QObject, QThread, pyqtSignal
 
 AMINO_ACIDS = set(["A", "C", "D", "E", "F",
                    "G", "H", "I", "K", "L",
@@ -36,11 +37,12 @@ class AsyncWorker(QObject):
 class AsyncWidget(QWidget):
     """Widget that can perform async operations"""
     def __init__(self):
+        super(AsyncWidget, self).__init__()
         self.thread = None
         self.worker = None
         self.in_progress = False
 
-    def _on_finish(self, _):
+    def _on_finish(self):
         self.in_progress = False
 
     def run_async(self, function, on_finish = None):
@@ -54,8 +56,8 @@ class AsyncWidget(QWidget):
 
         self.thread.started.connect(self.worker.run)
         self.thread.finished.connect(self.thread.deleteLater)
+        self.thread.finished.connect(self._on_finish)
 
-        self.worker.finished.connect(self._on_finish)
         if on_finish:
             self.worker.finished.connect(on_finish)
 

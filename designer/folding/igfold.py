@@ -1,12 +1,11 @@
 """Antibody folding via IgFold"""
 import os
 from typing import Optional
-from igfold import IgFoldRunner
 from pymol.cmd import get_names, read_pdbstr
 
 from designer.common import AMINO_ACIDS
 
-def fold_antibody(heavy_chain: str, light_chain: Optional[str], use_refine: bool) -> dict[str, str]:
+def fold_antibody(igfold, heavy_chain: str, light_chain: Optional[str], use_refine: bool) -> dict[str, str]:
     """Fold antibody sequence and output PDB"""
     sequences = {
         "H": heavy_chain
@@ -21,7 +20,6 @@ def fold_antibody(heavy_chain: str, light_chain: Optional[str], use_refine: bool
 
     result_pdb = ""
     try:
-        igfold = IgFoldRunner()
         igfold.fold("temp_file.pdb",
                     sequences=sequences, do_refine=use_refine,
                     use_openmm=True, do_renum=False)
@@ -40,7 +38,7 @@ def append_model(model_pdbstr: str, prefix: str = "antibody_"):
     structures = [structure for structure in structures if structure.startswith(prefix)]
     idx = 0
     if structures:
-        last_idx = [int(suffix) for structure in structures
-                    if (suffix := structure[len(prefix):]).isnumeric()]
+        last_idx = max(int(suffix) for structure in structures
+                       if (suffix := structure[len(prefix):]).isnumeric())
         idx = last_idx + 1
     read_pdbstr(model_pdbstr, f"{prefix}{idx}")

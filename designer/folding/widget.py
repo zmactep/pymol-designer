@@ -1,10 +1,10 @@
 """Folding window widget"""
 import os
 
-import time
-from PyQt5.QtWidgets import QWidget
-from PyQt5.QtCore import pyqtSignal, QThread
+from PyQt5.QtCore import pyqtSignal
 from PyQt5 import uic
+
+from igfold import IgFoldRunner
 
 from designer.common import is_aminoacids, AsyncWidget
 from designer.folding.igfold import fold_antibody, append_model
@@ -19,6 +19,7 @@ class FoldingWidget(AsyncWidget):
 
         self.heavy_chain_pred = ""
         self.light_chain_pred = ""
+        self.igfold = IgFoldRunner()
 
         self._setup()
 
@@ -41,7 +42,7 @@ class FoldingWidget(AsyncWidget):
         else:
             self.run_folding_button.setEnabled(False)
 
-    def _on_finish(self, result):
+    def _on_folding_finish(self, result):
         if result['status'] == 'ok':
             self.status_changed.emit("Folding finished")
             append_model(result['content'])
@@ -55,8 +56,8 @@ class FoldingWidget(AsyncWidget):
         use_refine = self.refine_checkbox.isChecked()
         self.status_changed.emit("Folding started")
         self.run_folding_button.setEnabled(False)
-        self.run_async(lambda: fold_antibody(heavy_chain, light_chain, use_refine),
-                       self._on_finish)
+        self.run_async(lambda: fold_antibody(self.igfold, heavy_chain, light_chain, use_refine),
+                       self._on_folding_finish)
 
     def _setup(self):
         self.heavy_chain_edit.textChanged.connect(lambda: self._check_edit(self.heavy_chain_edit,
