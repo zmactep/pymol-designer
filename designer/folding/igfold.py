@@ -3,9 +3,10 @@ import os
 from typing import Optional
 from pymol.cmd import get_names, read_pdbstr
 
-from designer.common import AMINO_ACIDS
+from .. import common
 
-def fold_antibody(igfold, heavy_chain: str, light_chain: Optional[str], use_refine: bool) -> dict[str, str]:
+def fold_antibody(igfold, heavy_chain: str, light_chain: Optional[str], 
+                  use_refine: bool) -> dict[str, str]:
     """Fold antibody sequence and output PDB"""
     sequences = {
         "H": heavy_chain
@@ -14,7 +15,7 @@ def fold_antibody(igfold, heavy_chain: str, light_chain: Optional[str], use_refi
         sequences["L"] = light_chain
 
     for chain, sequence in sequences.items():
-        if not all(c in AMINO_ACIDS for c in sequence):
+        if not common.is_aminoacids(sequence):
             return {"status": "error",
                     "content": f"Chain '{chain}' contains non-aminoacid characters"}
 

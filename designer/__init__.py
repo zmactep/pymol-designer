@@ -6,7 +6,7 @@ from pymol.plugins import addmenuitemqt
 from PyQt5.QtWidgets import QDialog, QTabWidget, QLineEdit, \
                             QPushButton, QVBoxLayout, QHBoxLayout
 
-from designer.folding.widget import FoldingWidget
+from .folding.widget import FoldingWidget
 
 # global reference to avoid garbage collection of our dialog
 dialog = None

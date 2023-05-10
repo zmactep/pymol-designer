@@ -6,10 +6,10 @@ from PyQt5 import uic
 
 from igfold import IgFoldRunner
 
-from designer.common import is_aminoacids, AsyncWidget
-from designer.folding.igfold import fold_antibody, append_model
+from .. import common
+from .igfold import fold_antibody, append_model
 
-class FoldingWidget(AsyncWidget):
+class FoldingWidget(common.AsyncWidget):
     """Widget with folding control"""
     status_changed = pyqtSignal(str)
 
@@ -31,7 +31,7 @@ class FoldingWidget(AsyncWidget):
 
     def _check_edit(self, edit, pred_text, set_pred_text):
         text = edit.toPlainText()
-        if not is_aminoacids(text, allow_spaces=True):
+        if not common.is_aminoacids(text, allow_spaces=True):
             edit.setText(pred_text)
         else:
             set_pred_text(text)
